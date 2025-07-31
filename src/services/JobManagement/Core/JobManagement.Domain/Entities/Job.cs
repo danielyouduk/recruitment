@@ -11,6 +11,9 @@ public class Job : AggregateRoot<Guid>
 
     public void Post()
     {
+        if (Status != JobStatus.Draft)
+            throw new InvalidOperationException("Job is already posted");
+        
         Status = JobStatus.Active;
     }
 }

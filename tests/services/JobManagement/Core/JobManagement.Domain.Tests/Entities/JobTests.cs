@@ -53,5 +53,16 @@ public class JobTests
         // Assert
         Assert.Equal(JobStatus.Active, job.Status);
     }
-
+    
+    [Fact]
+    public void Post_ShouldThrow_WhenJobAlreadyActive()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Post(); // Make it active first
+        
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Post());
+        Assert.Equal("Job is already posted", exception.Message);
+    }
 }
