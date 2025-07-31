@@ -1,0 +1,44 @@
+using JobManagement.Domain.Entities;
+using JobManagement.Domain.ValueObjects;
+
+namespace JobManagement.Domain.Tests.Entities;
+
+public class JobTests
+{
+    [Fact]
+    public void Job_ShouldHave_RequiredProperties()
+    {
+        // Arrange
+        var jobId = Guid.NewGuid();
+        var title = "Software Engineer";
+        
+        // Act
+        var job = new Job 
+        { 
+            Id = jobId, 
+            Title = title 
+        };
+        
+        // Assert
+        Assert.Equal(jobId, job.Id);
+        Assert.Equal(title, job.Title);
+        Assert.Equal(JobStatus.Draft, job.Status);
+        Assert.True(job.CreatedAt <= DateTime.UtcNow);
+        Assert.True(job.CreatedAt >= DateTime.UtcNow.AddSeconds(-1));
+    }
+    
+    [Fact]
+    public void Job_ShouldInitialize_WithDraftStatus()
+    {
+        // Arrange & Act
+        var job = new Job 
+        { 
+            Id = Guid.NewGuid(), 
+            Title = "Test Job" 
+        };
+        
+        // Assert
+        Assert.Equal(JobStatus.Draft, job.Status);
+    }
+
+}
