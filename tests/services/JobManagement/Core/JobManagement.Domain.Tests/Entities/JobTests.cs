@@ -6,20 +6,92 @@ namespace JobManagement.Domain.Tests.Entities;
 public class JobTests
 {
     [Fact]
-    public void Job_ShouldHave_RequiredProperties()
+    public void Job_ShouldInitializeWithCorrectDefaults()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+    
+        // Act
+        var job = new Job(details);
+    
+        // Assert
+        Assert.Equal(details, job.Details);
+        Assert.Equal(JobStatus.Draft, job.Status);
+        Assert.False(job.IsDeleted);
+        Assert.True(job.CreatedAt <= DateTime.UtcNow);
+        Assert.True(job.CreatedAt >= DateTime.UtcNow.AddSeconds(-1));
+    }
+    
+    [Fact]
+    public void Constructor_ShouldTrimWhitespace()
+    {
+        // Arrange
+        var title = "  Software Engineer  ";
+        var description = "  Build amazing software  ";
+        
+        // Act
+        var jobDetails = new JobDetails(title, description);
+        
+        // Assert
+        Assert.Equal("Software Engineer", jobDetails.Title);
+        Assert.Equal("Build amazing software", jobDetails.Description);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void Constructor_ShouldThrow_WhenTitleIsNullOrWhitespace(string invalidTitle)
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new JobDetails(invalidTitle));
+        Assert.Equal("Title cannot be null or empty (Parameter 'title')", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_ShouldThrow_WhenTitleExceedsMaxLength()
+    {
+        // Arrange
+        var longTitle = new string('A', JobDetails.MaxTitleLength + 1);
+        
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new JobDetails(longTitle));
+        Assert.Equal($"Title cannot exceed {JobDetails.MaxTitleLength} characters (Parameter 'title')", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_ShouldThrow_WhenDescriptionExceedsMaxLength()
     {
         // Arrange
         var title = "Software Engineer";
-        var details = new JobDetails(title);
+        var longDescription = new string('A', JobDetails.MaxDescriptionLength + 1);
         
-        // Act
-        var job = new Job(details);
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() => new JobDetails(title, longDescription));
+        Assert.Equal($"Description cannot exceed {JobDetails.MaxDescriptionLength} characters (Parameter 'description')", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_ShouldAccept_MaxLengthTitle()
+    {
+        // Arrange
+        var maxLengthTitle = new string('A', JobDetails.MaxTitleLength);
         
-        // Assert
-        Assert.Equal(title, job.Details.Title);
-        Assert.Equal(JobStatus.Draft, job.Status);
-        Assert.True(job.CreatedAt <= DateTime.UtcNow);
-        Assert.True(job.CreatedAt >= DateTime.UtcNow.AddSeconds(-1));
+        // Act & Assert
+        var jobDetails = new JobDetails(maxLengthTitle);
+        Assert.Equal(maxLengthTitle, jobDetails.Title);
+    }
+
+    [Fact]
+    public void Constructor_ShouldAccept_MaxLengthDescription()
+    {
+        // Arrange
+        var title = "Software Engineer";
+        var maxLengthDescription = new string('A', JobDetails.MaxDescriptionLength);
+        
+        // Act & Assert
+        var jobDetails = new JobDetails(title, maxLengthDescription);
+        Assert.Equal(maxLengthDescription, jobDetails.Description);
     }
     
     [Fact]
