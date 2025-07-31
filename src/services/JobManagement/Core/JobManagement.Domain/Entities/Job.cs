@@ -22,6 +22,9 @@ public class Job : AggregateRoot<Guid>
     
     public void Close()
     {
+        if (Status == JobStatus.Draft)
+            throw new InvalidOperationException("Cannot close a draft job. Delete it instead.");
+
         if (Status == JobStatus.Closed)
             throw new InvalidOperationException("Job is already closed");
         

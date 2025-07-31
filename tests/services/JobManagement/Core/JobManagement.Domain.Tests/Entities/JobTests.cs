@@ -91,4 +91,15 @@ public class JobTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
         Assert.Equal("Job is already closed", exception.Message);
     }
+    
+    [Fact]
+    public void Close_ShouldThrow_WhenJobIsDraft()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
+        Assert.Equal("Cannot close a draft job. Delete it instead.", exception.Message);
+    }
 }
