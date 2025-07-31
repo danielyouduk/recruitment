@@ -78,4 +78,17 @@ public class JobTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.Post());
         Assert.Equal("Cannot post a closed job", exception.Message);
     }
+    
+    [Fact]
+    public void Close_ShouldThrow_WhenJobAlreadyClosed()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Post();
+        job.Close();
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
+        Assert.Equal("Job is already closed", exception.Message);
+    }
 }
