@@ -102,4 +102,90 @@ public class JobTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
         Assert.Equal("Cannot close a draft job. Delete it instead.", exception.Message);
     }
+    
+    [Fact]
+    public void Delete_ShouldThrow_WhenJobIsActive()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Post(); // Make it active
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Delete());
+        Assert.Equal("Cannot delete an active job. Close it first.", exception.Message);
+    }
+
+    [Fact]
+    public void Delete_ShouldThrow_WhenJobIsClosed() 
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Post();
+        job.Close();
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Delete());
+        Assert.Equal("Cannot delete a closed job", exception.Message);
+    }
+    
+    [Fact]
+    public void Delete_ShouldSucceed_WhenJobIsDraft()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+    
+        // Act & Assert
+        job.Delete();
+    }
+    
+    
+    [Fact]
+    public void Delete_ShouldMarkAsDeleted_WhenJobIsDraft()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+    
+        // Act
+        job.Delete();
+    
+        // Assert
+        Assert.True(job.IsDeleted);
+        Assert.Equal(JobStatus.Draft, job.Status);
+    }
+
+    [Fact]
+    public void Delete_ShouldThrow_WhenJobIsAlreadyDeleted()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Delete();
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Delete());
+        Assert.Equal("Job is already deleted", exception.Message);
+    }
+
+    [Fact]
+    public void Post_ShouldThrow_WhenJobIsDeleted()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Delete();
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Post());
+        Assert.Equal("Cannot post a deleted job", exception.Message);
+    }
+
+    [Fact]
+    public void Close_ShouldThrow_WhenJobIsDeleted()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Delete();
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
+        Assert.Equal("Cannot close a deleted job", exception.Message);
+    }
 }

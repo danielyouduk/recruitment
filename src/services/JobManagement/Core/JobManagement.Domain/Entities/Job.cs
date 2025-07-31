@@ -7,10 +7,14 @@ public class Job : AggregateRoot<Guid>
 {
     public required string Title { get; init; }
     public JobStatus Status { get; private set; } = JobStatus.Draft;
+    public bool IsDeleted { get; private set; } = false;
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
     public void Post()
     {
+        if (IsDeleted)
+            throw new InvalidOperationException("Cannot post a deleted job");
+        
         if (Status == JobStatus.Active)
             throw new InvalidOperationException("Job is already posted");
         
@@ -22,6 +26,9 @@ public class Job : AggregateRoot<Guid>
     
     public void Close()
     {
+        if (IsDeleted)
+            throw new InvalidOperationException("Cannot close a deleted job");
+
         if (Status == JobStatus.Draft)
             throw new InvalidOperationException("Cannot close a draft job. Delete it instead.");
 
@@ -29,5 +36,19 @@ public class Job : AggregateRoot<Guid>
             throw new InvalidOperationException("Job is already closed");
         
         Status = JobStatus.Closed;
+    }
+    
+    public void Delete()
+    {
+        if (IsDeleted)
+            throw new InvalidOperationException("Job is already deleted");
+
+        if (Status == JobStatus.Active)
+            throw new InvalidOperationException("Cannot delete an active job. Close it first.");
+            
+        if (Status == JobStatus.Closed)
+            throw new InvalidOperationException("Cannot delete a closed job");
+        
+        IsDeleted = true;
     }
 }
