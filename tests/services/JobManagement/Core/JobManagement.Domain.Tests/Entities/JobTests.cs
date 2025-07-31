@@ -108,7 +108,7 @@ public class JobTests
     {
         // Arrange
         var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
-        job.Post(); // Make it active
+        job.Post();
     
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() => job.Delete());
@@ -187,5 +187,44 @@ public class JobTests
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
         Assert.Equal("Cannot close a deleted job", exception.Message);
+    }
+    
+    [Fact]
+    public void Restore_ShouldUnmarkDeleted_WhenJobIsDeleted()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Delete();
+    
+        // Act
+        job.Restore();
+    
+        // Assert
+        Assert.False(job.IsDeleted);
+        Assert.Equal(JobStatus.Draft, job.Status);
+    }
+
+    [Fact]
+    public void Restore_ShouldThrow_WhenJobIsNotDeleted()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Restore());
+        Assert.Equal("Job is not deleted", exception.Message);
+    }
+
+    [Fact]
+    public void Post_ShouldSucceed_AfterRestore()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+        job.Delete();
+        job.Restore();
+    
+        // Act & Assert
+        job.Post();
+        Assert.Equal(JobStatus.Active, job.Status);
     }
 }

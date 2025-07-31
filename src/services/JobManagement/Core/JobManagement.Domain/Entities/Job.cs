@@ -51,4 +51,12 @@ public class Job : AggregateRoot<Guid>
         
         IsDeleted = true;
     }
+    
+    public void Restore()
+    {
+        if (!IsDeleted)
+            throw new InvalidOperationException("Job is not deleted");
+        
+        IsDeleted = false;
+    }
 }
