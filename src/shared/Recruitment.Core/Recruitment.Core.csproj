@@ -6,8 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\..\shared\Recruitment.Core\Recruitment.Core.csproj" />
-    </ItemGroup>
-
 </Project>

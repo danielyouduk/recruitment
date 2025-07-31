@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobManagement.Domain", "src\services\JobManagement\Core\JobManagement.Domain\JobManagement.Domain.csproj", "{4DC1FAAD-6658-47AE-87AE-28BC5FFC3A2C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{77E05486-B8E2-4721-AD36-FFE67CB21D1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recruitment.Core", "src\shared\Recruitment.Core\Recruitment.Core.csproj", "{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,11 +32,17 @@ Global
 		{69C8CA05-8495-4834-987E-8136663F97AB} = {5C5991E2-FFBF-471D-8589-3B988BE0C03D}
 		{BBA59CDA-741C-4AF6-A4ED-110DDC5932C5} = {5C5991E2-FFBF-471D-8589-3B988BE0C03D}
 		{4DC1FAAD-6658-47AE-87AE-28BC5FFC3A2C} = {67C586D5-89E5-4DA6-8AB1-5BD768CAED37}
+		{77E05486-B8E2-4721-AD36-FFE67CB21D1F} = {C89FB194-8623-498B-8C42-5DC3EB944FE7}
+		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1} = {77E05486-B8E2-4721-AD36-FFE67CB21D1F}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4DC1FAAD-6658-47AE-87AE-28BC5FFC3A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4DC1FAAD-6658-47AE-87AE-28BC5FFC3A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DC1FAAD-6658-47AE-87AE-28BC5FFC3A2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DC1FAAD-6658-47AE-87AE-28BC5FFC3A2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
