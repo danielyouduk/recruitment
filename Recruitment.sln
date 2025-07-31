@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JobManagement", "JobManagem
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{A4B0D2DF-316E-41BE-AA58-F93F4690BCAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobManagement.Domain.Tests", "tests\services\JobManagement\Core\JobManagement.Domain.Tests\JobManagement.Domain.Tests.csproj", "{8C9E92B3-7C9E-4C6D-A778-BDCEBABBF2EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,7 @@ Global
 		{3A29750C-D0CF-45BF-977C-5BEB03900F5C} = {5B52F275-B540-4AB1-AAEC-7CA537459435}
 		{4FEA37BB-34E1-4564-A7A6-FD0B0183E018} = {3A29750C-D0CF-45BF-977C-5BEB03900F5C}
 		{A4B0D2DF-316E-41BE-AA58-F93F4690BCAA} = {4FEA37BB-34E1-4564-A7A6-FD0B0183E018}
+		{8C9E92B3-7C9E-4C6D-A778-BDCEBABBF2EF} = {A4B0D2DF-316E-41BE-AA58-F93F4690BCAA}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4DC1FAAD-6658-47AE-87AE-28BC5FFC3A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -55,5 +58,9 @@ Global
 		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C48C6C9-071B-46B4-852B-6B218D2B7BF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C9E92B3-7C9E-4C6D-A778-BDCEBABBF2EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C9E92B3-7C9E-4C6D-A778-BDCEBABBF2EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C9E92B3-7C9E-4C6D-A778-BDCEBABBF2EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C9E92B3-7C9E-4C6D-A778-BDCEBABBF2EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
