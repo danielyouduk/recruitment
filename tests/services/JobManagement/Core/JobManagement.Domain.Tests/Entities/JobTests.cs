@@ -40,5 +40,18 @@ public class JobTests
         // Assert
         Assert.Equal(JobStatus.Draft, job.Status);
     }
+    
+    [Fact]
+    public void Post_ShouldChangeStatus_FromDraftToActive()
+    {
+        // Arrange
+        var job = new Job { Id = Guid.NewGuid(), Title = "Software Engineer" };
+    
+        // Act
+        job.Post();
+    
+        // Assert
+        Assert.Equal(JobStatus.Active, job.Status);
+    }
 
 }

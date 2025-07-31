@@ -9,4 +9,8 @@ public class Job : AggregateRoot<Guid>
     public JobStatus Status { get; private set; } = JobStatus.Draft;
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 
+    public void Post()
+    {
+        Status = JobStatus.Active;
+    }
 }
