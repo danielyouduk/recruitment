@@ -1,8 +1,8 @@
 namespace Recruitment.Core.Common;
 
-public abstract class AggregateRoot<T>
+public abstract class AggregateRoot<T>(T id)
 {
-    public required T Id { get; init; }
+    public T Id { get; init; } = id;
 
     private readonly List<IDomainEvent> _domainEvents = new();
         
@@ -16,5 +16,9 @@ public abstract class AggregateRoot<T>
     public void ClearDomainEvents()
     {
         _domainEvents.Clear();
+    }
+    
+    protected AggregateRoot() : this(default(T)!)
+    {
     }
 }

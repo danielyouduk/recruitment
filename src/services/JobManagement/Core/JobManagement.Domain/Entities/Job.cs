@@ -5,10 +5,33 @@ namespace JobManagement.Domain.Entities;
 
 public class Job : AggregateRoot<Guid>
 {
-    public required string Title { get; init; }
+    public Job(JobDetails details) : base(Guid.NewGuid())
+    {
+        Id = Guid.NewGuid();
+        Details = details ?? throw new ArgumentNullException(nameof(details));
+    }
+
+    public JobDetails Details { get; private set; }
     public JobStatus Status { get; private set; } = JobStatus.Draft;
     public bool IsDeleted { get; private set; } = false;
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+
+    public void UpdateDetails(JobDetails newDetails)
+    {
+        if (newDetails == null)
+            throw new ArgumentNullException(nameof(newDetails));
+            
+        if (IsDeleted)
+            throw new InvalidOperationException("Cannot update details of a deleted job");
+            
+        if (Status == JobStatus.Active)
+            throw new InvalidOperationException("Cannot update details of an active job");
+            
+        if (Status == JobStatus.Closed)
+            throw new InvalidOperationException("Cannot update details of a closed job");
+            
+        Details = newDetails;
+    }
 
     public void Post()
     {
