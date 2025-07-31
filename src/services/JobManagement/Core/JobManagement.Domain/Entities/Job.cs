@@ -11,9 +11,17 @@ public class Job : AggregateRoot<Guid>
 
     public void Post()
     {
-        if (Status != JobStatus.Draft)
+        if (Status == JobStatus.Active)
             throw new InvalidOperationException("Job is already posted");
         
+        if (Status == JobStatus.Closed)
+            throw new InvalidOperationException("Cannot post a closed job");
+
         Status = JobStatus.Active;
+    }
+    
+    public void Close()
+    {
+        Status = JobStatus.Closed;
     }
 }
