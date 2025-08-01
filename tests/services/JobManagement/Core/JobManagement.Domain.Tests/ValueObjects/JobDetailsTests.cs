@@ -89,6 +89,21 @@ public class JobDetailsTests
     }
     
     [Fact]
+    public void UpdateDetails_ShouldThrow_WhenJobIsClosed()
+    {
+        // Arrange
+        var job = new Job(new JobDetails("Software Engineer"));
+        job.Post();
+        job.Close();
+
+        var newDetails = new JobDetails("New Title");
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.UpdateDetails(newDetails));
+        Assert.Equal("Cannot update details of a closed job", exception.Message);
+    }
+    
+    [Fact]
     public void UpdateDetails_ShouldUpdateTitleAndDescription_WhenJobIsDraft()
     {
         // Arrange
