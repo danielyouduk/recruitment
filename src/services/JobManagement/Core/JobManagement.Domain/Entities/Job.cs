@@ -16,6 +16,7 @@ public class Job : AggregateRoot<Guid>
     public JobStatus Status { get; private set; } = JobStatus.Draft;
     public bool IsDeleted { get; private set; } = false;
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTime? PostedAt { get; private set; }
 
     public void CreateDraft()
     {
@@ -43,6 +44,7 @@ public class Job : AggregateRoot<Guid>
             throw new InvalidOperationException("Cannot post a closed job");
 
         Status = JobStatus.Active;
+        PostedAt = DateTime.UtcNow;
     }
     
     public void UpdateDetails(JobDetails newDetails)

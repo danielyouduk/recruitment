@@ -284,4 +284,51 @@ public class JobTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.CreateDraft());
         Assert.Equal("Can only create draft from new job", exception.Message);
     }
+    
+    [Fact]
+    public void Job_ShouldInitializeWithNullPostedAt()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+
+        // Act
+        var job = new Job(details);
+
+        // Assert
+        Assert.Null(job.PostedAt);
+    }
+
+    [Fact]
+    public void Post_ShouldSetPostedAt_WhenJobIsPosted()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+        var beforePost = DateTime.UtcNow;
+
+        // Act
+        job.Post();
+
+        // Assert
+        Assert.NotNull(job.PostedAt);
+        Assert.True(job.PostedAt >= beforePost);
+        Assert.True(job.PostedAt <= DateTime.UtcNow);
+    }
+
+    [Fact]
+    public void Post_ShouldChangeStatusAndSetPostedAt()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+
+        // Act
+        job.Post();
+
+        // Assert
+        Assert.Equal(JobStatus.Active, job.Status);
+        Assert.NotNull(job.PostedAt);
+    }
 }
