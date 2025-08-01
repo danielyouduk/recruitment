@@ -14,7 +14,7 @@ public class Job : AggregateRoot<Guid>
     public JobDetails Details { get; private set; }
     public JobStatus Status { get; private set; } = JobStatus.Draft;
     public bool IsDeleted { get; private set; } = false;
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
     public void UpdateDetails(JobDetails newDetails)
     {
