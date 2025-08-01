@@ -5,6 +5,8 @@ namespace JobManagement.Domain.Tests.ValueObjects;
 
 public class JobDetailsTests
 {
+    #region Constructor Tests
+    
     [Fact]
     public void Constructor_ShouldTrimWhitespace()
     {
@@ -76,6 +78,10 @@ public class JobDetailsTests
         var jobDetails = new JobDetails(title, maxLengthDescription);
         Assert.Equal(maxLengthDescription, jobDetails.Description);
     }
+    
+    #endregion
+    
+    #region UpdateDetails Tests
     
     [Fact]
     public void UpdateDetails_ShouldThrow_WhenNewDetailsIsNull()
@@ -164,4 +170,6 @@ public class JobDetailsTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.UpdateDetails(newDetails));
         Assert.Equal("Cannot update details of a deleted job", exception.Message);
     }
+    
+    #endregion
 }
