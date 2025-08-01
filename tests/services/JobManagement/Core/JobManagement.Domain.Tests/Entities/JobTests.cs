@@ -5,6 +5,8 @@ namespace JobManagement.Domain.Tests.Entities;
 
 public class JobTests
 {
+    #region Contructor Tests
+    
     [Fact]
     public void Job_ShouldInitializeWithCorrectDefaults()
     {
@@ -24,6 +26,55 @@ public class JobTests
     }
     
     [Fact]
+    public void Job_ShouldInitializeWithNullPostedAt()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+
+        // Act
+        var job = new Job(details);
+
+        // Assert
+        Assert.Null(job.PostedAt);
+    }
+    
+    #endregion
+    
+    #region CreateDraft Tests
+    
+    // CreateDraft_ShouldSucceed_WhenJobIsNew
+    
+    [Fact]
+    public void CreateDraft_ShouldThrow_WhenJobIsDeleted()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.Delete();
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.CreateDraft());
+        Assert.Equal("Cannot create draft from a deleted job", exception.Message);
+    }
+    
+    [Fact]
+    public void CreateDraft_ShouldThrow_WhenJobIsNotNew()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.CreateDraft());
+        Assert.Equal("Can only create draft from new job", exception.Message);
+    }
+    
+    #endregion
+    
+    #region Post Tests
+    
+    [Fact]
     public void Post_ShouldChangeStatus_FromDraftToActive()
     {
         // Arrange
@@ -38,6 +89,36 @@ public class JobTests
         Assert.Equal(JobStatus.Active, job.Status);
     }
 
+    [Fact]
+    public void Post_ShouldSetPostedAt_WhenJobIsPosted()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+        var beforePost = DateTime.UtcNow;
+
+        // Act
+        job.Post();
+
+        // Assert
+        Assert.NotNull(job.PostedAt);
+        Assert.True(job.PostedAt >= beforePost);
+        Assert.True(job.PostedAt <= DateTime.UtcNow);
+    }
+    
+    [Fact]
+    public void Post_ShouldThrow_WhenJobIsNew()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Post());
+        Assert.Equal("Can only post saved draft jobs", exception.Message);
+    }
+    
     [Fact]
     public void Post_ShouldThrow_WhenJobAlreadyActive()
     {
@@ -67,7 +148,95 @@ public class JobTests
         Assert.Equal("Cannot post a closed job", exception.Message);
     }
     
+    [Fact]
+    public void Post_ShouldThrow_WhenJobIsDeleted()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+        job.Delete();
     
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Post());
+        Assert.Equal("Cannot post a deleted job", exception.Message);
+    }
+    
+    [Fact]
+    public void Post_ShouldSucceed_AfterRestore()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+        job.Delete();
+        job.Restore();
+    
+        // Act & Assert
+        job.Post();
+        Assert.Equal(JobStatus.Active, job.Status);
+    }
+    
+    [Fact]
+    public void Post_ShouldChangeStatusAndSetPostedAt()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+
+        // Act
+        job.Post();
+
+        // Assert
+        Assert.Equal(JobStatus.Active, job.Status);
+        Assert.NotNull(job.PostedAt);
+    }
+
+    #endregion
+    
+    #region Close Tests
+    
+    [Fact]
+    public void Close_ShouldSucceed_WhenJobIsActive()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+        job.Post();
+
+        // Act
+        job.Close();
+
+        // Assert
+        Assert.Equal(JobStatus.Closed, job.Status);
+    }
+
+    [Fact]
+    public void Close_ShouldThrow_WhenJobIsNew()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
+        Assert.Equal("Cannot close an unsaved job.", exception.Message);
+    }
+    
+    [Fact]
+    public void Close_ShouldThrow_WhenJobIsDraft()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.CreateDraft();
+        
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
+        Assert.Equal("Cannot close a draft job. Delete it instead.", exception.Message);
+    }
     
     [Fact]
     public void Close_ShouldThrow_WhenJobAlreadyClosed()
@@ -85,28 +254,49 @@ public class JobTests
     }
     
     [Fact]
-    public void Close_ShouldThrow_WhenJobIsDraft()
+    public void Close_ShouldThrow_WhenJobIsDeleted()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+        job.Delete();
+    
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
+        Assert.Equal("Cannot close a deleted job", exception.Message);
+    }
+    
+    #endregion
+    
+    #region Delete Tests
+    
+    [Fact]
+    public void Delete_ShouldSucceed_WhenJobIsNew()
+    {
+        // Arrange
+        var details = new JobDetails("Software Engineer");
+        var job = new Job(details);
+    
+        // Act
+        job.Delete();
+        
+        // Assert
+        Assert.True(job.IsDeleted);
+    }
+
+    [Fact]
+    public void Delete_ShouldMarkAsDeleted_WhenJobIsDraft()
     {
         // Arrange
         var details = new JobDetails("Software Engineer");
         var job = new Job(details);
         job.CreateDraft();
-        
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
-        Assert.Equal("Cannot close a draft job. Delete it instead.", exception.Message);
-    }
+        // Act
+        job.Delete();
     
-    [Fact]
-    public void Close_ShouldThrow_WhenJobIsNew()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-    
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
-        Assert.Equal("Cannot close an unsaved job.", exception.Message);
+        // Assert
+        Assert.True(job.IsDeleted);
+        Assert.Equal(JobStatus.Draft, job.Status);
     }
     
     [Fact]
@@ -122,7 +312,7 @@ public class JobTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.Delete());
         Assert.Equal("Cannot delete an active job. Close it first.", exception.Message);
     }
-
+    
     [Fact]
     public void Delete_ShouldThrow_WhenJobIsClosed() 
     {
@@ -139,32 +329,6 @@ public class JobTests
     }
     
     [Fact]
-    public void Delete_ShouldSucceed_WhenJobIsDraft()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-    
-        // Act & Assert
-        job.Delete();
-    }
-    
-    [Fact]
-    public void Delete_ShouldMarkAsDeleted_WhenJobIsDraft()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-        job.CreateDraft();
-        // Act
-        job.Delete();
-    
-        // Assert
-        Assert.True(job.IsDeleted);
-        Assert.Equal(JobStatus.Draft, job.Status);
-    }
-
-    [Fact]
     public void Delete_ShouldThrow_WhenJobIsAlreadyDeleted()
     {
         // Arrange
@@ -176,33 +340,21 @@ public class JobTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.Delete());
         Assert.Equal("Job is already deleted", exception.Message);
     }
-
+    
     [Fact]
-    public void Post_ShouldThrow_WhenJobIsDeleted()
+    public void Delete_ShouldSucceed_WhenJobIsDraft()
     {
         // Arrange
         var details = new JobDetails("Software Engineer");
         var job = new Job(details);
-        job.CreateDraft();
-        job.Delete();
     
         // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => job.Post());
-        Assert.Equal("Cannot post a deleted job", exception.Message);
+        job.Delete();
     }
+    
+    #endregion
 
-    [Fact]
-    public void Close_ShouldThrow_WhenJobIsDeleted()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-        job.Delete();
-    
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => job.Close());
-        Assert.Equal("Cannot close a deleted job", exception.Message);
-    }
+    #region Restore Tests
     
     [Fact]
     public void Restore_ShouldUnmarkDeleted_WhenJobIsDeleted()
@@ -220,7 +372,7 @@ public class JobTests
         Assert.False(job.IsDeleted);
         Assert.Equal(JobStatus.Draft, job.Status);
     }
-
+    
     [Fact]
     public void Restore_ShouldThrow_WhenJobIsNotDeleted()
     {
@@ -232,104 +384,6 @@ public class JobTests
         var exception = Assert.Throws<InvalidOperationException>(() => job.Restore());
         Assert.Equal("Job is not deleted", exception.Message);
     }
-
-    [Fact]
-    public void Post_ShouldSucceed_AfterRestore()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-        job.CreateDraft();
-        job.Delete();
-        job.Restore();
     
-        // Act & Assert
-        job.Post();
-        Assert.Equal(JobStatus.Active, job.Status);
-    }
-    
-    [Fact]
-    public void Post_ShouldThrow_WhenJobIsNew()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => job.Post());
-        Assert.Equal("Can only post saved draft jobs", exception.Message);
-    }
-    
-    [Fact]
-    public void CreateDraft_ShouldThrow_WhenJobIsDeleted()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-        job.Delete();
-
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => job.CreateDraft());
-        Assert.Equal("Cannot create draft from a deleted job", exception.Message);
-    }
-
-    [Fact]
-    public void CreateDraft_ShouldThrow_WhenJobIsNotNew()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-        job.CreateDraft();
-
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => job.CreateDraft());
-        Assert.Equal("Can only create draft from new job", exception.Message);
-    }
-    
-    [Fact]
-    public void Job_ShouldInitializeWithNullPostedAt()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-
-        // Act
-        var job = new Job(details);
-
-        // Assert
-        Assert.Null(job.PostedAt);
-    }
-
-    [Fact]
-    public void Post_ShouldSetPostedAt_WhenJobIsPosted()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-        job.CreateDraft();
-        var beforePost = DateTime.UtcNow;
-
-        // Act
-        job.Post();
-
-        // Assert
-        Assert.NotNull(job.PostedAt);
-        Assert.True(job.PostedAt >= beforePost);
-        Assert.True(job.PostedAt <= DateTime.UtcNow);
-    }
-
-    [Fact]
-    public void Post_ShouldChangeStatusAndSetPostedAt()
-    {
-        // Arrange
-        var details = new JobDetails("Software Engineer");
-        var job = new Job(details);
-        job.CreateDraft();
-
-        // Act
-        job.Post();
-
-        // Assert
-        Assert.Equal(JobStatus.Active, job.Status);
-        Assert.NotNull(job.PostedAt);
-    }
+    #endregion
 }
