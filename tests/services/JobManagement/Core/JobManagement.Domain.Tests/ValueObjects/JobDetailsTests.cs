@@ -78,6 +78,17 @@ public class JobDetailsTests
     }
     
     [Fact]
+    public void UpdateDetails_ShouldThrow_WhenNewDetailsIsNull()
+    {
+        // Arrange
+        var job = new Job(new JobDetails("Software Engineer"));
+
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentNullException>(() => job.UpdateDetails(null));
+        Assert.Equal("newDetails", exception.ParamName);
+    }
+    
+    [Fact]
     public void UpdateDetails_ShouldUpdateTitleAndDescription_WhenJobIsDraft()
     {
         // Arrange
