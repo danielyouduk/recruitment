@@ -93,6 +93,7 @@ public class JobDetailsTests
     {
         // Arrange
         var job = new Job(new JobDetails("Software Engineer"));
+        job.CreateDraft();
         job.Post();
         job.Close();
 
@@ -140,6 +141,7 @@ public class JobDetailsTests
     {
         // Arrange
         var job = new Job(new JobDetails("Software Engineer"));
+        job.CreateDraft();
         job.Post();
     
         var newDetails = new JobDetails("New Title");

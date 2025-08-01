@@ -9,6 +9,7 @@ public class Job : AggregateRoot<Guid>
     {
         Id = Guid.NewGuid();
         Details = details ?? throw new ArgumentNullException(nameof(details));
+        Status = JobStatus.New;
     }
 
     public JobDetails Details { get; private set; }
@@ -16,6 +17,34 @@ public class Job : AggregateRoot<Guid>
     public bool IsDeleted { get; private set; } = false;
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
+    public void CreateDraft()
+    {
+        if (IsDeleted)
+            throw new InvalidOperationException("Cannot create draft from a deleted job");
+            
+        if (Status != JobStatus.New)
+            throw new InvalidOperationException("Can only create draft from new job");
+            
+        Status = JobStatus.Draft;
+    }
+    
+    public void Post()
+    {
+        if (Status == JobStatus.New)
+            throw new InvalidOperationException("Can only post saved draft jobs");
+
+        if (IsDeleted)
+            throw new InvalidOperationException("Cannot post a deleted job");
+        
+        if (Status == JobStatus.Active)
+            throw new InvalidOperationException("Job is already posted");
+        
+        if (Status == JobStatus.Closed)
+            throw new InvalidOperationException("Cannot post a closed job");
+
+        Status = JobStatus.Active;
+    }
+    
     public void UpdateDetails(JobDetails newDetails)
     {
         if (newDetails == null)
@@ -32,26 +61,15 @@ public class Job : AggregateRoot<Guid>
             
         Details = newDetails;
     }
-
-    public void Post()
-    {
-        if (IsDeleted)
-            throw new InvalidOperationException("Cannot post a deleted job");
-        
-        if (Status == JobStatus.Active)
-            throw new InvalidOperationException("Job is already posted");
-        
-        if (Status == JobStatus.Closed)
-            throw new InvalidOperationException("Cannot post a closed job");
-
-        Status = JobStatus.Active;
-    }
     
     public void Close()
     {
         if (IsDeleted)
             throw new InvalidOperationException("Cannot close a deleted job");
 
+        if (Status == JobStatus.New)
+            throw new InvalidOperationException("Cannot close an unsaved job.");
+        
         if (Status == JobStatus.Draft)
             throw new InvalidOperationException("Cannot close a draft job. Delete it instead.");
 
