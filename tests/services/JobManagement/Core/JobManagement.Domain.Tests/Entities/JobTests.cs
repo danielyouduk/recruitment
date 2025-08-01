@@ -18,6 +18,7 @@ public class JobTests
         Assert.Equal(details, job.Details);
         Assert.Equal(JobStatus.New, job.Status);
         Assert.False(job.IsDeleted);
+        Assert.Null(job.PostedAt);
         Assert.True(job.CreatedAt <= DateTime.UtcNow);
         Assert.True(job.CreatedAt >= DateTime.UtcNow.AddSeconds(-1));
     }
